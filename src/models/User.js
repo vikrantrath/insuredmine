@@ -12,7 +12,7 @@ const UserSchema = mongoose.Schema(
     email: String,
     gender: String,
     userType: String,
-    policy: { type: mongoose.Schema.Types.ObjectId, ref: "Policy" },
+    policies: [{ type: mongoose.Schema.Types.ObjectId, ref: "Policy" }],
   },
   { collection: "User" }
 );

@@ -6,16 +6,18 @@ const { getSavedAgent } = require("./agentService");
 const { getSavedLOB } = require("./lobService");
 const { getSavedCarrier } = require("./carrierService");
 const { getSavedUserAccount } = require("./userAccountService");
+const { getSavedUser } = require("./userService");
 
 const mappedData = mapRawRowToRespectiveObject(workerData);
 
 const data = mappedData.map(async (data) => {
   try {
-    const savedUser = await new User(data.user).save();
     const savedAgent = await getSavedAgent(data.agent);
     const savedLOB = await getSavedLOB(data.lob);
     const savedCarrier = await getSavedCarrier(data.carrier);
     const savedUserAccount = await getSavedUserAccount(data.userAccount);
+
+    const savedUser = await getSavedUser(data.user);
 
     const savedPolicy = await new Policy({
       ...data.policy,
@@ -29,7 +31,7 @@ const data = mappedData.map(async (data) => {
     const updateData = await User.findByIdAndUpdate(
       savedUser._id,
       {
-        policy: savedPolicy._id,
+        $push: { policies: savedPolicy._id },
       },
       { new: true, runValidators: true, useFindAndModify: false }
     );

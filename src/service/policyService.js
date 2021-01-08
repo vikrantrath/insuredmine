@@ -22,7 +22,33 @@ function getAggregatedPolicy() {
     .populate("carrier", "-__v -_id");
 }
 
+async function getCityPolicyCount() {
+  try {
+    const cityData = await User.aggregate([
+      { $unwind: { path: "$policies", preserveNullAndEmptyArrays: false } },
+      {
+        $group: {
+          _id: "$state",
+          policyCount: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          state: "$_id",
+          policyCount: 1,
+        },
+      },
+    ]).exec();
+
+    return cityData;
+  } catch (error) {
+    return error;
+  }
+}
+
 module.exports = {
   getPolicyInfoByUsername,
   getAggregatedPolicy,
+  getCityPolicyCount,
 };
